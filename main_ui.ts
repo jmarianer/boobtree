@@ -1,4 +1,12 @@
-var prev:any, next:any, transition_stage:any, next_offset:any, prev_offset:any;
+import * as $ from 'jquery';
+import * as io from 'socket.io-client';
+
+var
+  prev : JQuery<HTMLElement>,
+  next : JQuery<HTMLElement>,
+  transition_stage : number,
+  next_offset : JQuery.CoordinatesPartial,
+  prev_offset : JQuery.CoordinatesPartial;
 
 function done() {
   transition_stage = 0
