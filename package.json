@@ -1,0 +1,45 @@
+{
+	"name": "boobtree",
+	"version": "0.0.1",
+	"description": "Just... boobtree",
+	"scripts": {
+		"start": "ts-node -O '{\"noImplicitAny\":true,\"jsx\":\"react\",\"typeRoots\":[\"types\"],\"baseUrl\":\"types\"}' server.ts"
+	},
+	"dependencies": {
+		"@types/async": "",
+		"@types/body-parser": "",
+		"@types/browserify": "",
+		"@types/concat-stream": "",
+		"@types/es6-promise": "",
+		"@types/express": "",
+		"@types/jquery": "",
+		"@types/jqueryui": "",
+		"@types/less": "",
+		"@types/mongodb": "",
+		"@types/node": "",
+		"@types/socket.io": "",
+		"@types/socket.io-client": "",
+		"array-flatten": "",
+		"async": "",
+		"body-parser": "",
+		"browserify": "",
+		"express": "^4.12.4",
+		"jquery": "",
+		"jquery-ui": "",
+		"less": "",
+		"mongodb": "",
+		"socket.io": "",
+		"ts-node": "",
+		"tsify": "",
+		"typescript": "rc",
+		"typescript-simple": ""
+	},
+	"engines": {
+		"node": "10.16.0"
+	},
+	"license": "",
+	"devDependencies": {
+		"lesshint": "^2.4.0",
+		"tslint": "^4.3.1"
+	}
+}
