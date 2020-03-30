@@ -25,11 +25,16 @@ $(() => {
   prev = $('#previous');
   next = $('#next');
   $('#done').click(done);
+  /*
+  canvas = new fabric.Canvas('c', {
+    isDrawingMode: true
+  });
+  */
 });
 
 socket.on('start', () => { 
-  prev.html('Enter your thingy here');
-  next.html('<textarea/>');
+  $('#initial').show();
+  $('#next-phrase').show();
 
   prev.animate({opacity: 1});
   next.animate({opacity: 1});

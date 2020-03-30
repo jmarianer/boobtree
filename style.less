@@ -8,9 +8,22 @@ body {
 div {
   width: 500px;
   height: 300px;
-  background-color: white;
-  border: 1px solid black;
   margin: 10px;
   position: relative;
   opacity: 0;
+  text-align: center;
+
+  span, canvas, textarea {
+    width: 100%;
+    height: 100%;
+    font-size: 2em;
+    background-color: white;
+    border: 1px solid black;
+    display: none;
+  }
+
+  #initial {
+    border: none;
+    background: none;
+  }
 }
