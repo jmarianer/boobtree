@@ -93,6 +93,8 @@ async.parallel([
     }
     sockets[game][user] = socket;
 
+    console.log(Object.getOwnPropertyNames(sockets[game]));
+
     socket.emit('start');
   });
 });

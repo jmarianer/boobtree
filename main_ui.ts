@@ -9,22 +9,28 @@ var
   prev_offset : JQuery.Coordinates;
 
 function done() {
-  transition_stage = 0
-  next_offset = next.offset()
-  prev_offset = prev.offset()
+  transition_stage = 0;
+  next_offset = next.offset();
+  prev_offset = prev.offset();
 
   next.animate({top: prev_offset.top - next_offset.top}, () => {
-    prev.css({visibility: 'hidden'})
-    next.animate({left: -1000 - next_offset.left})
-  })
+    prev.css({visibility: 'hidden'});
+    next.animate({left: -1000 - next_offset.left});
+  });
 }
 
 let socket = io();
 
 $(() => {
-  prev = $('#previous')
-  next = $('#next')
-  $('#done').click(done)
+  prev = $('#previous');
+  next = $('#next');
+  $('#done').click(done);
 });
 
-socket.on('start', () => { alert(6) })
+socket.on('start', () => { 
+  prev.html('Enter your thingy here');
+  next.html('<textarea/>');
+
+  prev.animate({opacity: 1});
+  next.animate({opacity: 1});
+})
