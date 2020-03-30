@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as less from 'less';
 import * as path from 'path';
 import * as io from 'socket.io';
+import Route = require('route-parser');
 
 // Helpers for serving Typescript and Less as JS and CSS.
 function serveJs(app: express.Express, url: string, tsFilename: string,
@@ -54,6 +55,14 @@ function serveCss(app: express.Express, url: string, lessFilename: string,
 
 // Main begins here.
 const app = express();
+const route = '/game/:game/user/:user';
+
+interface user {
+  game: string;
+  user: string;
+}
+
+let sockets : {[gameid:string] : {[userid:string] : SocketIO.Socket}} = {};
 
 async.parallel([
   async.apply(serveJs, app, '/js/boobtree.js', 'main_ui.ts'),
@@ -63,7 +72,7 @@ async.parallel([
     throw err;
   }
 
-  app.get('/game/:game/user/:user', (request, response) => {
+  app.get(route, (request, response) => {
     async.waterfall([
       async.apply(fs.readFile, 'main_ui.html'),
       async.asyncify((data: Buffer) => response.send(data.toString())),
@@ -75,5 +84,15 @@ async.parallel([
   });
 
   let ioListener = io(listener);
-  ioListener.on('connection', (socket) => {});
+  ioListener.on('connection', (socket) => {
+    let referer = new URL(socket.client.request.headers.referer);
+    let foo = new Route(route).match(referer.pathname) as unknown as user;
+    let { game, user } = foo;
+    if (!(game in sockets)) {
+      sockets[game] = {};
+    }
+    sockets[game][user] = socket;
+
+    socket.emit('start');
+  });
 });
