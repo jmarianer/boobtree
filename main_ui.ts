@@ -1,4 +1,5 @@
 import * as $ from 'jquery';
+import {fabric} from 'fabric';
 import * as io from 'socket.io-client';
 
 enum Mode { phrase, drawing }
@@ -29,61 +30,97 @@ function done() {
         case Mode.phrase:
           let val = $('#next-phrase').val();
           socket.emit('phrase', val);
+          break
+        case Mode.drawing:
+          socket.emit('phrase', canvas.toDataURL({format: 'png'}));
       }
     });
   });
 }
 
 let socket = io();
+let canvas : fabric.Canvas;
 
 $(() => {
   prev = $('#previous');
   next = $('#next');
   $('#done').click(done);
-  /*
-  canvas = new fabric.Canvas('c', {
+  canvas = new fabric.Canvas('next-drawing', {
     isDrawingMode: true
   });
-  */
 });
 
-socket.on('wait', () => { 
+function waitmode() {
   $('#instructions').css({visibility: 'visible'});
+  $('#previous-phrase').hide();
+  $('#previous-drawing').hide();
+  $('#next-drawing').parent().hide();
+  $('#next-phrase').hide();
+  $('#done').prop('disabled', true);
+}
+function drawmode() {
+  $('#instructions').css({visibility: 'visible'});
+  $('#previous-text').show();
+  $('#previous-drawing').hide();
+  $('#next-drawing').parent().show();
+  canvas.clear();
+  $('#next-phrase').hide();
+  $('#done').prop('disabled', false);
+
+  current_mode = Mode.drawing;
+}
+function phrasemode() {
+  $('#instructions').css({visibility: 'visible'});
+  $('#previous-text').hide();
+  $('#previous-drawing').show();
+  $('#next-drawing').parent().hide();
+  $('#next-phrase').show();
+  $('#next-phrase').val('');
+  $('#done').prop('disabled', false);
+
+  current_mode = Mode.phrase;
+}
+function startmode() {
+  phrasemode();
+  $('#previous-drawing').hide();
+}
+
+socket.on('wait', () => { 
+  waitmode();
   $('#instructions').text('Please wait for the rest of your party');
 });
 socket.on('wait1', () => { 
-  $('#instructions').css({visibility: 'visible'});
+  waitmode();
   $('#instructions').text('Please wait for other players to finish the round');
 });
 
 socket.on('start', () => { 
+  startmode();
   $('#instructions').text('Write a phrase here');
-  $('#initial').show();
-  $('#next-phrase').show();
-  $('#done').prop('disabled', false);
-  current_mode = Mode.phrase;
 
-  prev.animate({opacity: 1});
   next.animate({opacity: 1});
 });
 
 socket.on('phrase', (phrase : string) => {
+  drawmode();
+  $('#previous-text').text(phrase);
+  $('#instructions').text('Draw that phrase below');
+
   prev.offset({left: 1000});
   prev.css({opacity: 1, visibility: 'visible'});
-  prev.children().hide();
-  $('#previous-text').show();
-  $('#previous-text').text(phrase);
   prev.animate({left: 0}, () => {
     next.animate({opacity: 1});
   });
+});
 
-  next.children().hide();
-  $('#next-phrase').show();
-  $('#next-phrase').val('');
+socket.on('drawing', (phrase : string) => {
+  phrasemode();
+  $('#previous-drawing').attr("src", phrase);
+  $('#instructions').text('Draw that phrase below');
 
-  $('#instructions').css({visibility: 'visible'});
-  //$('#instructions').text('Draw that phrase below');
-  $('#instructions').text('Telephone it below or something');
-
-  $('#done').prop('disabled', false);
+  prev.offset({left: 1000});
+  prev.css({opacity: 1, visibility: 'visible'});
+  prev.animate({left: 0}, () => {
+    next.animate({opacity: 1});
+  });
 });

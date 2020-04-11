@@ -33,12 +33,14 @@ export class Game {
     let player = this.players[name];
     if (this.current_round == 0) {
       player.socket.emit('wait');
-    } else if (this.current_round == 1 && !player.latest_phrase) {
-      player.socket.emit('start');
     } else if (player.latest_phrase) {
       player.socket.emit('wait1');
-    } else {
+    } else if (this.current_round == 1) {
+      player.socket.emit('start');
+    } else if (this.current_round % 2 == 0) {
       player.socket.emit('phrase', player.current_phrase);
+    } else {
+      player.socket.emit('drawing', player.current_phrase);
     }
   }
 
