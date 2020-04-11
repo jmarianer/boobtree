@@ -1,40 +1,44 @@
 export class Game {
-  player_count : number;
   current_round : number;
   players : { [user:string] : {
     socket : SocketIO.Socket;
+    name : string;
   }};
-  rounds : string[][];
-  player_names : string[];
 
-  constructor(count : number) {
-    this.player_count = count;
+  constructor() {
     this.players = {};
+    this.current_round = 0;
   }
-  add_player(user : string, socket : SocketIO.Socket) {
-    this.players[user] = { socket : socket};
-    let all_names = Object.getOwnPropertyNames(this.players);
-    if (all_names.length == this.player_count) {
-      this.start();
+  add_player(name : string, socket : SocketIO.Socket) {
+    this.players[name] = { name : name, socket : socket };
+    socket.on('phrase', (phrase : string) => {
+      this.add_phrase(name, phrase);
+    });
+
+    this.update_socket(name);
+  }
+
+  update_all_sockets() {
+    for (let name of Object.getOwnPropertyNames(this.players)) {
+      this.update_socket(name);
+    }
+  }
+  update_socket(name : string) {
+    let player = this.players[name];
+    if (this.current_round == 0) {
+      player.socket.emit('wait');
+    } else if (this.current_round == 1) {
+      player.socket.emit('start');
     }
   }
 
   start() {
-    this.current_round = 0;
-    this.rounds = [[]];
-    this.player_names = Object.getOwnPropertyNames(this.players);
-
-    for (let player = 0; player < this.player_names.length; player++) {
-      let name = this.player_names[player];
-      let socket = this.players[name].socket;
-      socket.emit('start', name, this.player_names);
-      socket.on('phrase', (phrase : string) => {
-        this.add_phrase(player, phrase);
-      });
-    }
+    this.current_round = 1;
+    this.update_all_sockets();
   }
 
-  add_phrase(player : number, phrase : string) {
+  add_phrase(name : string, phrase : string) {
+   /*
     let round = this.rounds[this.current_round];
     round[player] = phrase;
     let players_done = round.filter((_) => true).length;
@@ -47,5 +51,5 @@ export class Game {
         socket.emit('phrase', round[(player + 1) % this.player_names.length]);
       }
     }
-  }
+  */}
 };

@@ -47,6 +47,10 @@ $(() => {
   */
 });
 
+socket.on('wait', () => { 
+  $('#instructions').text('Please wait for the rest of your party');
+});
+
 socket.on('start', () => { 
   $('#instructions').text('Write a phrase here');
   $('#initial').show();
@@ -72,7 +76,8 @@ socket.on('phrase', (phrase : string) => {
   $('#next-phrase').val('');
 
   $('#instructions').css({visibility: 'visible'});
-  $('#instructions').text('Draw that phrase below');
+  //$('#instructions').text('Draw that phrase below');
+  $('#instructions').text('Telephone it below or something');
 
   $('#done').prop('disabled', false);
 });

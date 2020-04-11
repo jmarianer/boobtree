@@ -12,6 +12,7 @@ import Route = require('route-parser');
 import { Game } from './game';
 
 // Helpers for serving Typescript and Less as JS and CSS.
+// TODO: Factor out of both here and the crosswords site.
 function serveJs(app: express.Express, url: string, tsFilename: string,
                  callback: async.AsyncResultArrayCallback<string, string>) {
   let errors = false;
@@ -74,6 +75,9 @@ async.parallel([
       async.asyncify((data: Buffer) => response.send(data.toString())),
     ]);
   });
+  app.get('/game/:game/start', (request, response) => {
+    games[+request.params.game].start();
+  });
 
   let listener = app.listen(process.env.PORT, () => {
     console.log('Your app is up');
@@ -87,7 +91,7 @@ async.parallel([
       user : string;
     };
     if (!(+game in games)) {
-      games[+game] = new Game(2);
+      games[+game] = new Game();
     }
 
     games[+game].add_player(user, socket);
