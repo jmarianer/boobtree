@@ -45,16 +45,13 @@ $(() => {
   prev = $('#previous');
   next = $('#next');
   $('#done').click(done);
-  canvas = new fabric.Canvas('next-drawing', {
-    isDrawingMode: true
-  });
 });
 
 function waitmode() {
   $('#instructions').css({visibility: 'visible'});
   $('#previous-phrase').hide();
   $('#previous-drawing').hide();
-  $('#next-drawing').parent().hide();
+  $('#next-drawing').hide();
   $('#next-phrase').hide();
   $('#done').prop('disabled', true);
 }
@@ -62,8 +59,15 @@ function drawmode() {
   $('#instructions').css({visibility: 'visible'});
   $('#previous-text').show();
   $('#previous-drawing').hide();
-  $('#next-drawing').parent().show();
-  canvas.clear();
+  $('#next-drawing').show();
+  if (canvas) {
+    canvas.clear();
+  } else {
+    canvas = new fabric.Canvas('next-drawing-canvas', {
+      isDrawingMode: true
+    });
+    canvas.setDimensions({width: 500, height: 300});
+  }
   $('#next-phrase').hide();
   $('#done').prop('disabled', false);
 
@@ -73,7 +77,7 @@ function phrasemode() {
   $('#instructions').css({visibility: 'visible'});
   $('#previous-text').hide();
   $('#previous-drawing').show();
-  $('#next-drawing').parent().hide();
+  $('#next-drawing').hide();
   $('#next-phrase').show();
   $('#next-phrase').val('');
   $('#done').prop('disabled', false);
@@ -116,7 +120,7 @@ socket.on('phrase', (phrase : string) => {
 socket.on('drawing', (phrase : string) => {
   phrasemode();
   $('#previous-drawing').attr("src", phrase);
-  $('#instructions').text('Draw that phrase below');
+  $('#instructions').text('Describe that drawing below');
 
   prev.offset({left: 1000});
   prev.css({opacity: 1, visibility: 'visible'});
