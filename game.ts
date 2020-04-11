@@ -3,6 +3,8 @@ export class Game {
   players : { [user:string] : {
     socket : SocketIO.Socket;
     name : string;
+    current_phrase? : string;
+    latest_phrase? : string;
   }};
 
   constructor() {
@@ -10,7 +12,11 @@ export class Game {
     this.current_round = 0;
   }
   add_player(name : string, socket : SocketIO.Socket) {
-    this.players[name] = { name : name, socket : socket };
+    if (name in this.players) {
+      this.players[name].socket = socket;
+    } else {
+      this.players[name] = { name : name, socket : socket };
+    }
     socket.on('phrase', (phrase : string) => {
       this.add_phrase(name, phrase);
     });
@@ -27,8 +33,12 @@ export class Game {
     let player = this.players[name];
     if (this.current_round == 0) {
       player.socket.emit('wait');
-    } else if (this.current_round == 1) {
+    } else if (this.current_round == 1 && !player.latest_phrase) {
       player.socket.emit('start');
+    } else if (player.latest_phrase) {
+      player.socket.emit('wait1');
+    } else {
+      player.socket.emit('phrase', player.current_phrase);
     }
   }
 
@@ -38,18 +48,23 @@ export class Game {
   }
 
   add_phrase(name : string, phrase : string) {
-   /*
-    let round = this.rounds[this.current_round];
-    round[player] = phrase;
-    let players_done = round.filter((_) => true).length;
-    if (players_done == this.player_count) {
-      this.current_round++;
-      this.rounds.push([]);
-      for (let player = 0; player < this.player_names.length; player++) {
-        let name = this.player_names[player];
-        let socket = this.players[name].socket;
-        socket.emit('phrase', round[(player + 1) % this.player_names.length]);
-      }
+    this.players[name].latest_phrase = phrase;
+
+    if (Object.getOwnPropertyNames(this.players).every((name) => this.players[name].latest_phrase)) {
+      this.next_round();
+      this.update_all_sockets();
+    } else {
+      this.update_socket(name);
     }
-  */}
+  }
+
+  next_round() {
+    this.current_round++;
+    let names = Object.getOwnPropertyNames(this.players);
+    for (let i = 0; i < names.length; i++) {
+      let i1 = (i + 1) % names.length;
+      this.players[names[i1]].current_phrase = this.players[names[i]].latest_phrase;
+      this.players[names[i]].latest_phrase = undefined;
+    }
+  }
 };

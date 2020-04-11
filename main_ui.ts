@@ -48,13 +48,19 @@ $(() => {
 });
 
 socket.on('wait', () => { 
+  $('#instructions').css({visibility: 'visible'});
   $('#instructions').text('Please wait for the rest of your party');
+});
+socket.on('wait1', () => { 
+  $('#instructions').css({visibility: 'visible'});
+  $('#instructions').text('Please wait for other players to finish the round');
 });
 
 socket.on('start', () => { 
   $('#instructions').text('Write a phrase here');
   $('#initial').show();
   $('#next-phrase').show();
+  $('#done').prop('disabled', false);
   current_mode = Mode.phrase;
 
   prev.animate({opacity: 1});
@@ -63,7 +69,7 @@ socket.on('start', () => {
 
 socket.on('phrase', (phrase : string) => {
   prev.offset({left: 1000});
-  prev.css({visibility: 'visible'});
+  prev.css({opacity: 1, visibility: 'visible'});
   prev.children().hide();
   $('#previous-text').show();
   $('#previous-text').text(phrase);
