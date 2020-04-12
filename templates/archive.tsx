@@ -5,18 +5,25 @@ import base = require('./base');
 import { ArchiveElt } from '../game';
 
 function showIndividualCard(card: ArchiveElt, index: number) {
-  let header = <h3>{ card.player_name }:</h3>;
   if (index % 2) {
-    return [header, <img src={ card.phrase_or_drawing } />];
+    return [
+      <h3>{ card.player_name } drew:</h3>,
+      <img src={ card.phrase_or_drawing } />
+    ];
   } else {
-    return [header, <div>{ card.phrase_or_drawing }</div>];
+    return [
+      <h3>{ card.player_name } wrote:</h3>,
+      <div>{ card.phrase_or_drawing }</div>
+    ];
   }
 }
 
-function showOneThingy(thingy : ArchiveElt[], index: number) {
-  return [<h2>Thing { index + 1 }</h2>,
-    thingy.map(showIndividualCard)];
+function showChain(chain : ArchiveElt[], index: number) {
+  return <div class="chain">
+    <h2>Chain { index + 1 }</h2>
+    { chain.map(showIndividualCard)}
+  </div>;
 }
 
 export = (archive: ArchiveElt[][]) => base('', 'Boobtree game archive',
-    ...flatten(archive.map(showOneThingy)));
+    ...archive.map(showChain));
