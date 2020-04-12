@@ -5,6 +5,7 @@ import concat = require('concat-stream');
 import * as express from 'express';
 import * as fs from 'fs';
 import * as less from 'less';
+import { Collection, MongoClient } from 'mongodb';
 import * as path from 'path';
 import * as io from 'socket.io';
 import Route = require('route-parser');
@@ -59,15 +60,21 @@ function serveCss(app: express.Express, url: string, lessFilename: string,
 // Main begins here.
 const app = express();
 const route = '/game/:game/user/:user';
-let games : { [gameid:number] : Game } = {};
+let games : { [gameid:string] : Game } = {};
 
 async.parallel([
   async.apply(serveJs, app, '/js/boobtree.js', 'main_ui.ts'),
   async.apply(serveCss, app, '/style/style.css', 'style.less'),
-], (err, _results) => {
+  async.apply(async.waterfall, [
+    async.apply(MongoClient.connect, process.env.MONGODB),
+    async.asyncify((client: MongoClient) => client.db('boobtree').collection('boobtree')),
+  ]),
+], (err, results) => {
   if (err) {
     throw err;
   }
+
+  let db: Collection = results[2];
 
   app.get(route, (request, response) => {
     async.waterfall([
@@ -75,8 +82,20 @@ async.parallel([
       async.asyncify((data: Buffer) => response.send(data.toString())),
     ]);
   });
+  app.get('/newgame', (request, response) => {
+    db.insertOne({a:5}, (err, result) => {
+      if (err) {
+        throw err;
+      }
+
+      let game = result.ops[0]._id.toHexString();
+      games[game] = new Game();
+
+      response.send('<a href="/joingame/'+game+'">foo</a>');
+  });
+  });
   app.get('/game/:game/start', (request, response) => {
-    games[+request.params.game].start();
+    games[request.params.game].start();
   });
 
   let listener = app.listen(process.env.PORT, () => {
@@ -90,10 +109,7 @@ async.parallel([
       game : string;
       user : string;
     };
-    if (!(+game in games)) {
-      games[+game] = new Game();
-    }
 
-    games[+game].add_player(user, socket);
+    games[game].add_player(user, socket);
   });
 });
