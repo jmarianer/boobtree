@@ -128,3 +128,7 @@ socket.on('drawing', (phrase : string) => {
     next.animate({opacity: 1});
   });
 });
+
+socket.on('done', () => {
+  window.location.href = '../archive';
+});
