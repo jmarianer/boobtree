@@ -1,39 +1,45 @@
 export class Game {
   id : string;
   current_round : number;
-  players : { [user:string] : {
+  players : {
     socket : SocketIO.Socket;
     name : string;
     current_phrase? : string;
     latest_phrase? : string;
-  }};
+  }[];
+  rounds_archive : string[][];
+  players_by_name : { [user:string] : number };
 
   constructor(id: string) {
     this.id = id;
-    this.players = {};
+    this.players = [];
+    this.players_by_name = {};
     this.current_round = 0;
   }
 
   add_player(name : string, socket : SocketIO.Socket) {
-    if (name in this.players) {
-      this.players[name].socket = socket;
+    let player_num : number;
+    if (name in this.players_by_name) {
+      player_num = this.players_by_name[name];
+      this.players[player_num].socket = socket;
     } else {
-      this.players[name] = { name : name, socket : socket };
+      player_num = this.players_by_name[name] = this.players.length;
+      this.players.push({ name : name, socket : socket });
     }
     socket.on('phrase', (phrase : string) => {
-      this.add_phrase(name, phrase);
+      this.add_phrase(player_num, phrase);
     });
 
-    this.update_socket(name);
+    this.update_socket(player_num);
   }
 
   update_all_sockets() {
-    for (let name of Object.getOwnPropertyNames(this.players)) {
-      this.update_socket(name);
+    for (let i = 0; i < this.players.length; i++) {
+      this.update_socket(i);
     }
   }
-  update_socket(name : string) {
-    let player = this.players[name];
+  update_socket(i : number) {
+    let player = this.players[i];
     if (this.current_round == 0) {
       player.socket.emit('wait');
     } else if (player.latest_phrase) {
@@ -52,24 +58,23 @@ export class Game {
     this.update_all_sockets();
   }
 
-  add_phrase(name : string, phrase : string) {
-    this.players[name].latest_phrase = phrase;
+  add_phrase(i : number, phrase : string) {
+    this.players[i].latest_phrase = phrase;
 
-    if (Object.getOwnPropertyNames(this.players).every((name) => this.players[name].latest_phrase)) {
+    if (this.players.every((player) => player.latest_phrase)) {
       this.next_round();
       this.update_all_sockets();
     } else {
-      this.update_socket(name);
+      this.update_socket(i);
     }
   }
 
   next_round() {
     this.current_round++;
-    let names = Object.getOwnPropertyNames(this.players);
-    for (let i = 0; i < names.length; i++) {
-      let i1 = (i + 1) % names.length;
-      this.players[names[i1]].current_phrase = this.players[names[i]].latest_phrase;
-      this.players[names[i]].latest_phrase = undefined;
+    for (let i = 0; i < this.players.length; i++) {
+      let i1 = (i + 1) % this.players.length;
+      this.players[i1].current_phrase = this.players[i].latest_phrase;
+      this.players[i].latest_phrase = undefined;
     }
   }
 };
