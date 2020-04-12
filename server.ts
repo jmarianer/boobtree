@@ -12,6 +12,8 @@ import Route = require('route-parser');
 
 import { Game } from './game';
 
+import joinTemplate = require('./templates/join');
+
 // Helpers for serving Typescript and Less as JS and CSS.
 // TODO: Factor out of both here and the crosswords site.
 function serveJs(app: express.Express, url: string, tsFilename: string,
@@ -63,18 +65,19 @@ const route = '/game/:game/user/:user';
 let games : { [gameid:string] : Game } = {};
 
 async.parallel([
-  async.apply(serveJs, app, '/js/boobtree.js', 'main_ui.ts'),
-  async.apply(serveCss, app, '/style/style.css', 'style.less'),
   async.apply(async.waterfall, [
     async.apply(MongoClient.connect, process.env.MONGODB),
     async.asyncify((client: MongoClient) => client.db('boobtree').collection('boobtree')),
   ]),
+  async.apply(serveJs, app, '/js/boobtree.js', 'main_ui.ts'),
+  async.apply(serveJs, app, '/js/join.js', 'join.ts'),
+  async.apply(serveCss, app, '/style/style.css', 'style.less'),
 ], (err, results) => {
   if (err) {
     throw err;
   }
 
-  let db: Collection = results[2];
+  let db: Collection = results[0];
 
   app.get(route, (request, response) => {
     async.waterfall([
@@ -91,8 +94,11 @@ async.parallel([
       let game = result.ops[0]._id.toHexString();
       games[game] = new Game();
 
-      response.send('<a href="/joingame/'+game+'">foo</a>');
+      response.send('<a href="/game/'+game+'/join">foo</a>');
+    });
   });
+  app.get('/game/:game/join', (request, response) => {
+    response.send(joinTemplate(request.params.game));
   });
   app.get('/game/:game/start', (request, response) => {
     games[request.params.game].start();
