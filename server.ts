@@ -126,6 +126,8 @@ async.parallel([
       user : string;
     };
 
-    games[game].add_player(user, socket);
+    if (game in games) {
+      games[game].add_player(user, socket);
+    }
   });
 });
