@@ -86,15 +86,15 @@ async.parallel([
     ]);
   });
   app.get('/newgame', (request, response) => {
-    db.insertOne({a:5}, (err, result) => {
+    db.insertOne({}, (err, result) => {
       if (err) {
         throw err;
       }
 
       let game = result.ops[0]._id.toHexString();
-      games[game] = new Game();
+      games[game] = new Game(game);
 
-      response.send('<a href="/game/'+game+'/join">foo</a>');
+      response.send('<a href="/game/'+game+'/join">Join</a> <a href="/game/'+game+'/start">Start</a>');
     });
   });
   app.get('/game/:game/join', (request, response) => {

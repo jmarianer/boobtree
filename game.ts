@@ -1,4 +1,5 @@
 export class Game {
+  id : string;
   current_round : number;
   players : { [user:string] : {
     socket : SocketIO.Socket;
@@ -7,10 +8,12 @@ export class Game {
     latest_phrase? : string;
   }};
 
-  constructor() {
+  constructor(id: string) {
+    this.id = id;
     this.players = {};
     this.current_round = 0;
   }
+
   add_player(name : string, socket : SocketIO.Socket) {
     if (name in this.players) {
       this.players[name].socket = socket;
