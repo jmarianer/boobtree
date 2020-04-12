@@ -20,6 +20,7 @@ declare global {
       public input: { id?: string; class?: string; type?: string; name?: string; value?: string };
       public th: { class?: string, colspan?: string };
       public td: { class?: string, colspan?: string };
+      public img: { class?: string, src: string };
       [tag: string]: Element;
     }
   }

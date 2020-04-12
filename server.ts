@@ -13,6 +13,7 @@ import Route = require('route-parser');
 import { Game } from './game';
 
 import joinTemplate = require('./templates/join');
+import archiveTemplate = require('./templates/archive');
 
 // Helpers for serving Typescript and Less as JS and CSS.
 // TODO: Factor out of both here and the crosswords site.
@@ -102,6 +103,9 @@ async.parallel([
   });
   app.get('/game/:game/start', (request, response) => {
     games[request.params.game].start();
+  });
+  app.get('/game/:game/archive', (request, response) => {
+    response.send(archiveTemplate(games[request.params.game]));
   });
 
   let listener = app.listen(process.env.PORT, () => {

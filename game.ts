@@ -1,3 +1,8 @@
+export class ArchiveElt {
+  player_name : string;
+  phrase_or_drawing : string;
+};
+
 export class Game {
   id : string;
   current_round : number;
@@ -7,7 +12,7 @@ export class Game {
     current_phrase? : string;
     latest_phrase? : string;
   }[];
-  rounds_archive : string[][];
+  archive : ArchiveElt[][];
   players_by_name : { [user:string] : number };
 
   constructor(id: string) {
@@ -42,6 +47,8 @@ export class Game {
     let player = this.players[i];
     if (this.current_round == 0) {
       player.socket.emit('wait');
+    } else if (this.current_round > this.players.length) {
+      player.socket.emit('done');
     } else if (player.latest_phrase) {
       player.socket.emit('wait1');
     } else if (this.current_round == 1) {
@@ -55,6 +62,10 @@ export class Game {
 
   start() {
     this.current_round = 1;
+    this.archive = [];
+    for (let _ of this.players) {
+      this.archive.push([]);
+    }
     this.update_all_sockets();
   }
 
@@ -72,6 +83,16 @@ export class Game {
   next_round() {
     this.current_round++;
     for (let i = 0; i < this.players.length; i++) {
+      let archive_no = (i - this.current_round + 2*this.players.length) % this.players.length;
+      console.log(i);
+      console.log(this.current_round);
+      console.log(archive_no);
+      console.log(this.archive.length);
+      this.archive[archive_no].push({
+        player_name: this.players[i].name,
+        phrase_or_drawing: this.players[i].latest_phrase,
+      });
+
       let i1 = (i + 1) % this.players.length;
       this.players[i1].current_phrase = this.players[i].latest_phrase;
       this.players[i].latest_phrase = undefined;
