@@ -5,7 +5,7 @@ import concat = require('concat-stream');
 import * as express from 'express';
 import * as fs from 'fs';
 import * as less from 'less';
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, MongoClient, ObjectID } from 'mongodb';
 import * as path from 'path';
 import * as io from 'socket.io';
 import Route = require('route-parser');
@@ -93,7 +93,7 @@ async.parallel([
       }
 
       let game = result.ops[0]._id.toHexString();
-      games[game] = new Game(game);
+      games[game] = new Game(db, game);
 
       response.send('<a href="/game/'+game+'/join">Join</a> <a href="/game/'+game+'/start">Start</a>');
     });
@@ -105,7 +105,13 @@ async.parallel([
     games[request.params.game].start();
   });
   app.get('/game/:game/archive', (request, response) => {
-    response.send(archiveTemplate(games[request.params.game]));
+    db.findOne({ _id: new ObjectID(request.params.game)}, (err, result) => {
+      if (err) {
+        throw err;
+      }
+
+      response.send(archiveTemplate(result.archive));
+    });
   });
 
   let listener = app.listen(process.env.PORT, () => {

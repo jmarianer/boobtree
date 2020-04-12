@@ -1,9 +1,12 @@
+import { Collection, ObjectID } from 'mongodb';
+
 export class ArchiveElt {
   player_name : string;
   phrase_or_drawing : string;
 };
 
 export class Game {
+  db : Collection;
   id : string;
   current_round : number;
   players : {
@@ -15,7 +18,8 @@ export class Game {
   archive : ArchiveElt[][];
   players_by_name : { [user:string] : number };
 
-  constructor(id: string) {
+  constructor(db: Collection, id: string) {
+    this.db = db;
     this.id = id;
     this.players = [];
     this.players_by_name = {};
@@ -84,10 +88,6 @@ export class Game {
     this.current_round++;
     for (let i = 0; i < this.players.length; i++) {
       let archive_no = (i - this.current_round + 2*this.players.length) % this.players.length;
-      console.log(i);
-      console.log(this.current_round);
-      console.log(archive_no);
-      console.log(this.archive.length);
       this.archive[archive_no].push({
         player_name: this.players[i].name,
         phrase_or_drawing: this.players[i].latest_phrase,
@@ -97,5 +97,7 @@ export class Game {
       this.players[i1].current_phrase = this.players[i].latest_phrase;
       this.players[i].latest_phrase = undefined;
     }
+
+    this.db.update({_id: new ObjectID(this.id)}, {$set: {archive: this.archive}});
   }
 };
