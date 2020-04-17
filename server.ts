@@ -12,6 +12,7 @@ import Route = require('route-parser');
 
 import { Game } from './game';
 
+import newGameTemplate = require('./templates/newgame');
 import joinTemplate = require('./templates/join');
 import archiveTemplate = require('./templates/archive');
 
@@ -72,6 +73,7 @@ async.parallel([
   ]),
   async.apply(serveJs, app, '/js/boobtree.js', 'main_ui.ts'),
   async.apply(serveJs, app, '/js/join.js', 'join.ts'),
+  async.apply(serveJs, app, '/js/new.js', 'newgame.ts'),
   async.apply(serveCss, app, '/style/style.css', 'style.less'),
 ], (err, results) => {
   if (err) {
@@ -95,7 +97,7 @@ async.parallel([
       let game = result.ops[0]._id.toHexString();
       games[game] = new Game(db, game);
 
-      response.send('<a href="/game/'+game+'/join">Join</a> <a href="/game/'+game+'/start">Start</a>');
+      response.send(newGameTemplate(game));
     });
   });
   app.get('/game/:game/join', (request, response) => {
