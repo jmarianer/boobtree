@@ -63,7 +63,8 @@ function serveCss(app: express.Express, url: string, lessFilename: string,
 
 // Main begins here.
 const app = express();
-const route = '/game/:game/user/:user';
+const userRoute = '/game/:game/user/:user';
+const newRoute = '/game/:game/new';
 let games : { [gameid:string] : Game } = {};
 
 async.parallel([
@@ -82,7 +83,7 @@ async.parallel([
 
   let db: Collection = results[0];
 
-  app.get(route, (request, response) => {
+  app.get(userRoute, (request, response) => {
     async.waterfall([
       async.apply(fs.readFile, 'main_ui.html'),
       async.asyncify((data: Buffer) => response.send(data.toString())),
@@ -97,8 +98,11 @@ async.parallel([
       let game = result.ops[0]._id.toHexString();
       games[game] = new Game(db, game);
 
-      response.send(newGameTemplate(game));
+      response.redirect('/game/' + game + '/new');
     });
+  });
+  app.get(newRoute, (request, response) => {
+    response.send(newGameTemplate(request.params.game));
   });
   app.get('/game/:game/join', (request, response) => {
     response.send(joinTemplate(request.params.game));
@@ -122,14 +126,24 @@ async.parallel([
 
   let ioListener = io(listener);
   ioListener.on('connection', (socket) => {
-    let referer = new URL(socket.client.request.headers.referer);
-    let { game, user } = new Route(route).match(referer.pathname) as unknown as {
-      game : string;
-      user : string;
-    };
+    let referer = new URL(socket.client.request.headers.referer).pathname;
+    if (path.basename(referer) == 'new') {
+      let { game } = new Route(newRoute).match(referer) as unknown as {
+        game : string;
+      };
 
-    if (game in games) {
-      games[game].add_player(user, socket);
+      if (game in games) {
+        games[game].set_socket(socket);
+      }
+    } else {
+      let { game, user } = new Route(userRoute).match(referer) as unknown as {
+        game : string;
+        user : string;
+      };
+
+      if (game in games) {
+        games[game].add_player(user, socket);
+      }
     }
   });
 });

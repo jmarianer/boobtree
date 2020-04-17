@@ -17,6 +17,7 @@ export class Game {
   }[];
   archive : ArchiveElt[][];
   players_by_name : { [user:string] : number };
+  socket? : SocketIO.Socket;
 
   constructor(db: Collection, id: string) {
     this.db = db;
@@ -24,6 +25,14 @@ export class Game {
     this.players = [];
     this.players_by_name = {};
     this.current_round = 0;
+  }
+
+  set_socket(socket : SocketIO.Socket) {
+    this.socket = socket;
+
+    for (let name in this.players_by_name) {
+      this.socket.emit('player', name);
+    }
   }
 
   add_player(name : string, socket : SocketIO.Socket) {
@@ -34,6 +43,9 @@ export class Game {
     } else {
       player_num = this.players_by_name[name] = this.players.length;
       this.players.push({ name : name, socket : socket });
+      if (this.socket) {
+        this.socket.emit('player', name);
+      }
     }
     socket.on('phrase', (phrase : string) => {
       this.add_phrase(player_num, phrase);
