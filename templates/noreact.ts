@@ -14,7 +14,7 @@ declare global {
     class IntrinsicElements {
       public link: { class?: string; rel: string; href: string };
       public script: { class?: string; src: string };
-      public a: { class?: string; href: string };
+      public a: { id?: string; class?: string; href: string };
       public form: { class?: string; id?: string; action: string; method: string };
       public textarea: { class?: string; rows: string; cols: string; name: string };
       public input: { id?: string; class?: string; type?: string; name?: string; value?: string };
