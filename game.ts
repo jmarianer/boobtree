@@ -68,9 +68,9 @@ export class Game {
     } else if (player.latest_phrase) {
       player.socket.emit('wait1');
     } else if (this.current_round == 1) {
-      player.socket.emit('start');
+      player.socket.emit('start', this.players.length);
     } else if (this.current_round % 2 == 0) {
-      player.socket.emit('phrase', player.current_phrase);
+      player.socket.emit('phrase', player.current_phrase, this.players.length, this.current_round);
     } else {
       player.socket.emit('drawing', player.current_phrase);
     }

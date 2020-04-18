@@ -98,14 +98,18 @@ socket.on('wait1', () => {
   $('#instructions').text('Please wait for other players to finish the round');
 });
 
-socket.on('start', () => { 
+socket.on('start', (player_count : number) => { 
   startmode();
+  $('#n').text(player_count)
+  $('#k').text('1')
   $('#instructions').text('Write a phrase here');
 
   next.animate({opacity: 1});
 });
 
-socket.on('phrase', (phrase : string) => {
+socket.on('phrase', (phrase : string, current_round : number, player_count : number) => {
+  $('#n').text(player_count)
+  $('#k').text(current_round);
   drawmode();
   $('#previous-text').text(phrase);
   $('#instructions').text('Draw that phrase below');
