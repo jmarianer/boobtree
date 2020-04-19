@@ -30,9 +30,7 @@ export class Game {
   set_socket(socket : SocketIO.Socket) {
     this.socket = socket;
 
-    for (let name in this.players_by_name) {
-      this.socket.emit('player', name);
-    }
+    this.socket.emit('players', this.players_by_name);
   }
 
   add_player(name : string, socket : SocketIO.Socket) {
@@ -44,7 +42,7 @@ export class Game {
       player_num = this.players_by_name[name] = this.players.length;
       this.players.push({ name : name, socket : socket });
       if (this.socket) {
-        this.socket.emit('player', name);
+        this.socket.emit('players', this.players_by_name);
       }
     }
     socket.on('phrase', (phrase : string) => {
