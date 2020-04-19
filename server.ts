@@ -84,10 +84,14 @@ async.parallel([
   let db: Collection = results[0];
 
   app.get(userRoute, (request, response) => {
-    async.waterfall([
-      async.apply(fs.readFile, 'main_ui.html'),
-      async.asyncify((data: Buffer) => response.send(data.toString())),
-    ]);
+    if (request.params.game in games) {
+      async.waterfall([
+        async.apply(fs.readFile, 'main_ui.html'),
+        async.asyncify((data: Buffer) => response.send(data.toString())),
+      ]);
+    } else {
+      response.status(404).send("No such game");
+    }
   });
   app.get('/newgame', (request, response) => {
     db.insertOne({}, (err, result) => {
@@ -116,7 +120,11 @@ async.parallel([
         throw err;
       }
 
-      response.send(archiveTemplate(result.archive));
+      if (result && result.archive) {
+        response.send(archiveTemplate(result.archive));
+      } else {
+        response.status(404).send("No such game");
+      }
     });
   });
 
