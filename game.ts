@@ -70,7 +70,7 @@ export class Game {
     } else if (this.current_round == 1) {
       player.socket.emit('start', this.players.length);
     } else if (this.current_round % 2 == 0) {
-      player.socket.emit('phrase', player.current_phrase, this.players.length, this.current_round);
+      player.socket.emit('phrase', player.current_phrase, this.current_round, this.players.length);
     } else {
       player.socket.emit('drawing', player.current_phrase);
     }
