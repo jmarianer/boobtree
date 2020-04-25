@@ -121,7 +121,9 @@ socket.on('phrase', (phrase : string, current_round : number, player_count : num
   });
 });
 
-socket.on('drawing', (phrase : string) => {
+socket.on('drawing', (phrase : string, current_round : number, player_count : number) => {
+  $('#n').text(player_count)
+  $('#k').text(current_round);
   phrasemode();
   $('#previous-drawing').attr("src", phrase);
   $('#instructions').text('Describe that drawing below');
