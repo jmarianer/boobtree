@@ -112,7 +112,12 @@ async.parallel([
     response.send(joinTemplate(request.params.game));
   });
   app.get('/game/:game/start', (request, response) => {
-    games[request.params.game].start();
+    if (game in games) {
+      games[request.params.game].start();
+      response.send("Game started. Please close this window");
+    } else {
+      response.status(404).send("No such game");
+    }
   });
   app.get('/game/:game/archive', (request, response) => {
     db.findOne({ _id: new ObjectID(request.params.game)}, (err, result) => {
