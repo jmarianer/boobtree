@@ -112,7 +112,7 @@ async.parallel([
     response.send(joinTemplate(request.params.game));
   });
   app.get('/game/:game/start', (request, response) => {
-    if (game in games) {
+    if (request.params.game in games) {
       games[request.params.game].start();
       response.send("Game started. Please close this window");
     } else {
