@@ -30,12 +30,12 @@ export class Game {
   set_socket(socket : SocketIO.Socket) {
     this.socket = socket;
 
-    this.socket.emit('players', this.players_by_name);
+    this.socket.emit('players', this.players_by_name.keys());
   }
 
   add_player(name : string, socket : SocketIO.Socket) {
     let player_num : number;
-    if (name in this.players_by_name) {
+    if (name in this.players_by_name.keys()) {
       player_num = this.players_by_name[name];
       this.players[player_num].socket = socket;
     } else {
