@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"description": "Just... boobtree",
 	"scripts": {
-		"start": "ts-node -O '{\"noImplicitAny\":true,\"jsx\":\"react\",\"typeRoots\":[\"types\"],\"baseUrl\":\"types\"}' server.ts"
+		"start": "node_modules/ts-node -O '{\"noImplicitAny\":true,\"jsx\":\"react\",\"typeRoots\":[\"types\"],\"baseUrl\":\"types\"}' server.ts"
 	},
 	"dependencies": {
 		"@types/async": "",
