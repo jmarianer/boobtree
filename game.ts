@@ -30,19 +30,19 @@ export class Game {
   set_socket(socket : SocketIO.Socket) {
     this.socket = socket;
 
-    this.socket.emit('players', this.players_by_name.keys());
+    this.socket.emit('players', Object.keys(this.players_by_name));
   }
 
   add_player(name : string, socket : SocketIO.Socket) {
     let player_num : number;
-    if (name in this.players_by_name.keys()) {
+    if (name in this.players_by_name) {
       player_num = this.players_by_name[name];
       this.players[player_num].socket = socket;
     } else {
       player_num = this.players_by_name[name] = this.players.length;
       this.players.push({ name : name, socket : socket });
       if (this.socket) {
-        this.socket.emit('players', this.players_by_name);
+        this.socket.emit('players', Object.keys(this.players_by_name));
       }
     }
     socket.on('phrase', (phrase : string) => {
