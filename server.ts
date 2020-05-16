@@ -16,6 +16,12 @@ import newGameTemplate = require('./templates/newgame');
 import joinTemplate = require('./templates/join');
 import archiveTemplate = require('./templates/archive');
 
+process.on('uncaughtException', function (err) {
+  console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+  console.error(err.stack);
+  process.exit(1);
+})
+
 // Helpers for serving Typescript and Less as JS and CSS.
 // TODO: Factor out of both here and the crosswords site.
 function serveJs(app: express.Express, url: string, tsFilename: string,
