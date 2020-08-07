@@ -3,6 +3,7 @@
 	"version": "0.0.1",
 	"description": "Just... boobtree",
 	"scripts": {
+		"tsc": "tsc"
 	},
 	"dependencies": {
 		"@types/async": "",
@@ -34,7 +35,8 @@
 		"socket.io": "",
 		"ts-node": "",
 		"tsify": "",
-		"typescript": "rc",
+		"tslib": "",
+		"typescript": "",
 		"typescript-simple": ""
 	},
 	"engines": {
