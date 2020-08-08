@@ -8,6 +8,7 @@ export class ArchiveElt {
 export class Game {
   db : Collection;
   id : string;
+  shortId : string;
   current_round : number;
   players : {
     socket : SocketIO.Socket;
@@ -19,9 +20,10 @@ export class Game {
   players_by_name : { [user:string] : number };
   socket? : SocketIO.Socket;
 
-  constructor(db: Collection, id: string) {
+  constructor(db: Collection, id: string, shortId: string) {
     this.db = db;
     this.id = id;
+    this.shortId = shortId;
     this.players = [];
     this.players_by_name = {};
     this.current_round = 0;

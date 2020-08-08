@@ -9,6 +9,7 @@ import { Collection, MongoClient, ObjectID } from 'mongodb';
 import * as path from 'path';
 import * as io from 'socket.io';
 import Route = require('route-parser');
+import cryptoRandomString = require('crypto-random-string');
 
 import { Game } from './game';
 
@@ -32,6 +33,7 @@ const app = express();
 const userRoute = '/game/:game/user/:user';
 const newRoute = '/game/:game/new';
 let games : { [gameid:string] : Game } = {};
+let shortIds : { [shortId:string] : string } = {};
 
 serveStatic(app, '/js/boobtree.js', 'main_ui.js');
 serveStatic(app, '/js/join.js', 'join.js');
@@ -39,6 +41,16 @@ serveStatic(app, '/js/new.js', 'newgame.js');
 serveStatic(app, '/style/style.css', 'style.css');
 serveStatic(app, '/', 'index.html');
 serveStatic(app, '/boobtrees.jpg', 'boobtrees.jpg');
+
+app.get('/joinwithcode', (request, response) => {
+  let code:string = request.query['code'] as string;
+  code = code.toUpperCase();
+  if (code in shortIds) {
+    response.redirect('/game/' + shortIds[code] + '/join');
+  } else {
+    response.status(404).send("No such game");
+  }
+});
 
 MongoClient.connect(process.env.MONGODB, (err, client) => {
   if (err) {
@@ -64,13 +76,15 @@ MongoClient.connect(process.env.MONGODB, (err, client) => {
       }
 
       let game = result.ops[0]._id.toHexString();
-      games[game] = new Game(db, game);
-
+      let shortId = cryptoRandomString({length: 6, type: 'distinguishable'});
+      games[game] = new Game(db, game, shortId);
+      shortIds[shortId] = game;
+      
       response.redirect('/game/' + game + '/new');
     });
   });
   app.get(newRoute, (request, response) => {
-    response.send(newGameTemplate(request.params.game));
+    response.send(newGameTemplate(request.params.game, games[request.params.game].shortId));
   });
   app.get('/game/:game/join', (request, response) => {
     response.send(joinTemplate(request.params.game));

@@ -25,6 +25,7 @@
 		"async": "",
 		"body-parser": "",
 		"browserify": "",
+    "crypto-random-string": "",
 		"express": "^4.12.4",
 		"fabric": "",
 		"jquery": "",
