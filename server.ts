@@ -37,6 +37,8 @@ serveStatic(app, '/js/boobtree.js', 'main_ui.js');
 serveStatic(app, '/js/join.js', 'join.js');
 serveStatic(app, '/js/new.js', 'newgame.js');
 serveStatic(app, '/style/style.css', 'style.css');
+serveStatic(app, '/', 'index.html');
+serveStatic(app, '/boobtrees.jpg', 'boobtrees.jpg');
 
 MongoClient.connect(process.env.MONGODB, (err, client) => {
   if (err) {

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: boobtree
+spec:
+  selector:
+    app: boobtree
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: LoadBalancer
+  loadBalancerIP: 35.184.147.205

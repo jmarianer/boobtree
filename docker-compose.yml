@@ -1,6 +1,7 @@
 version: '3'
 services:
   web:
+    image: gcr.io/prefab-conquest-186122/boobtree
     build: .
     ports:
       - "3000:3000"
