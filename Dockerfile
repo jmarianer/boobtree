@@ -8,4 +8,6 @@ RUN npm install
 
 COPY . ./
 RUN npm run tsc
+RUN npm run lessc style.less style.css
+
 CMD npm start

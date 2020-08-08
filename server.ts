@@ -16,39 +16,18 @@ import newGameTemplate = require('./templates/newgame');
 import joinTemplate = require('./templates/join');
 import archiveTemplate = require('./templates/archive');
 
-process.on('uncaughtException', function (err) {
-  console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
-  console.error(err.stack);
-  process.exit(1);
-})
-
 function serveStatic(app: express.Express, url: string, filename: string) {
   app.get(url, (req, res) => {
     res.sendFile(path.resolve(__dirname, filename));
   });
 }
 
-// TODO: remove this
-function serveCss(app: express.Express, url: string, lessFilename: string,
-                  callback: async.AsyncResultArrayCallback<string, string>) {
-  console.log('Compiling ' + lessFilename);
-  async.waterfall([
-    async.apply(fs.readFile, lessFilename),
-    async.asyncify((data: Buffer) => data.toString()),
-    // TODO: Figure out why this is not the same as just "less.render".
-    (data: string, cb: (error: Less.RenderError, output: Less.RenderOutput) => void) => less.render(data, cb),
-    async.asyncify((data: Less.RenderOutput) => {
-      app.get(url, (req, res) => {
-        res.set('Content-Type', 'text/css');
-        res.send(data.css);
-      });
-      console.log('Finished compiling ' + lessFilename);
-      callback(null, null);
-    }),
-  ]);
-}
+process.on('uncaughtException', function (err) {
+  console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+  console.error(err.stack);
+  process.exit(1);
+})
 
-// Main begins here.
 const app = express();
 const userRoute = '/game/:game/user/:user';
 const newRoute = '/game/:game/new';
@@ -57,19 +36,14 @@ let games : { [gameid:string] : Game } = {};
 serveStatic(app, '/js/boobtree.js', 'main_ui.js');
 serveStatic(app, '/js/join.js', 'join.js');
 serveStatic(app, '/js/new.js', 'newgame.js');
+serveStatic(app, '/style/style.css', 'style.css');
 
-async.parallel([
-  async.apply(async.waterfall, [
-    async.apply(MongoClient.connect, process.env.MONGODB),
-    async.asyncify((client: MongoClient) => client.db('boobtree').collection('boobtree')),
-  ]),
-  async.apply(serveCss, app, '/style/style.css', 'style.less'),
-], (err, results) => {
+MongoClient.connect(process.env.MONGODB, (err, client) => {
   if (err) {
     throw err;
   }
 
-  let db: Collection = results[0];
+  let db: Collection = client.db('boobtree').collection('boobtree');
 
   app.get(userRoute, (request, response) => {
     if (request.params.game in games) {

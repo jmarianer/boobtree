@@ -3,7 +3,8 @@
 	"version": "0.0.1",
 	"description": "Just... boobtree",
 	"scripts": {
-		"tsc": "tsc"
+		"tsc": "tsc",
+		"lessc": "lessc"
 	},
 	"dependencies": {
 		"@types/async": "",
