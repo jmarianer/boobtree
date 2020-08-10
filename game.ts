@@ -10,6 +10,7 @@ export class Game {
   id : string;
   shortId : string;
   current_round : number;
+  total_rounds : number;
   players : {
     socket : SocketIO.Socket;
     name : string;
@@ -63,21 +64,24 @@ export class Game {
     let player = this.players[i];
     if (this.current_round == 0) {
       player.socket.emit('wait');
-    } else if (this.current_round > this.players.length) {
+    } else if (this.current_round > this.total_rounds) {
       player.socket.emit('done');
     } else if (player.latest_phrase) {
       player.socket.emit('wait1');
     } else if (this.current_round == 1) {
-      player.socket.emit('start', this.players.length);
+      player.socket.emit('start', this.total_rounds);
     } else if (this.current_round % 2 == 0) {
-      player.socket.emit('phrase', player.current_phrase, this.current_round, this.players.length);
+      player.socket.emit('phrase', player.current_phrase, this.current_round, this.total_rounds);
     } else {
-      player.socket.emit('drawing', player.current_phrase, this.current_round, this.players.length);
+      player.socket.emit('drawing', player.current_phrase, this.current_round, this.total_rounds);
     }
   }
 
   start() {
     this.current_round = 1;
+    this.total_rounds = this.players.length;
+    if (this.total_rounds % 2 == 0) this.total_rounds--;
+
     this.archive = [];
     for (let _ of this.players) {
       this.archive.push([]);
