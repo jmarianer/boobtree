@@ -23,7 +23,7 @@ spec:
             configMapKeyRef:
               key: MONGODB
               name: boobtree-config-4cyc
-        image: gcr.io/prefab-conquest-186122/boobtree@sha256:a6af368286a1ed56e447da6dcff26c7377a2549d7cf5729597dd527bb19c5db6
+        image: gcr.io/prefab-conquest-186122/boobtree@sha256:5ceeaa5817387b955c22c164c27709090af4be30572d09a487c0afd75d35f45a
         imagePullPolicy: IfNotPresent
         name: boobtree-sha256-1
         resources: {}

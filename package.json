@@ -36,8 +36,7 @@
 		"socket.io": "",
 		"ts-node": "",
 		"tsify": "",
-		"tslib": "",
-		"typescript": "",
+		"typescript": "rc",
 		"typescript-simple": ""
 	},
 	"engines": {

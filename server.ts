@@ -29,16 +29,57 @@ process.on('uncaughtException', function (err) {
   process.exit(1);
 })
 
+// Helpers for serving Typescript and Less as JS and CSS.
+// TODO: Factor out of both here and the crosswords site.
+function serveJs(app: express.Express, url: string, tsFilename: string,
+                 callback: async.AsyncResultArrayCallback<string, string>) {
+  let errors = false;
+  console.log('Compiling ' + tsFilename);
+  browserify(tsFilename)
+    .plugin('tsify', { noImplicitAny: true, jsx: 'react' })
+    .bundle()
+    .on('error', (error: Error) => {
+      console.error(error.toString());
+      errors = true;
+    })
+    .pipe(concat((buf: Buffer) => {
+      if (errors) {
+        callback('Error compiling ' + tsFilename, null);
+      }
+      console.log('Finished compiling ' + tsFilename);
+      app.get(url, (req, res) => {
+        res.set('Content-Type', 'text/javascript');
+        res.send(buf.toString());
+      });
+      callback(null, null);
+    }));
+}
+
+function serveCss(app: express.Express, url: string, lessFilename: string,
+                  callback: async.AsyncResultArrayCallback<string, string>) {
+  console.log('Compiling ' + lessFilename);
+  async.waterfall([
+    async.apply(fs.readFile, lessFilename),
+    async.asyncify((data: Buffer) => data.toString()),
+    // TODO: Figure out why this is not the same as just "less.render".
+    (data: string, cb: (error: Less.RenderError, output: Less.RenderOutput) => void) => less.render(data, cb),
+    async.asyncify((data: Less.RenderOutput) => {
+      app.get(url, (req, res) => {
+        res.set('Content-Type', 'text/css');
+        res.send(data.css);
+      });
+      console.log('Finished compiling ' + lessFilename);
+      callback(null, null);
+    }),
+  ]);
+}
+
 const app = express();
 const userRoute = '/game/:game/user/:user';
 const newRoute = '/game/:game/new';
 let games : { [gameid:string] : Game } = {};
 let shortIds : { [shortId:string] : string } = {};
 
-serveStatic(app, '/js/boobtree.js', 'main_ui.js');
-serveStatic(app, '/js/join.js', 'join.js');
-serveStatic(app, '/js/new.js', 'newgame.js');
-serveStatic(app, '/style/style.css', 'style.css');
 serveStatic(app, '/', 'index.html');
 serveStatic(app, '/boobtrees.jpg', 'boobtrees.jpg');
 
@@ -52,12 +93,21 @@ app.get('/joinwithcode', (request, response) => {
   }
 });
 
-MongoClient.connect(process.env.MONGODB, (err, client) => {
+async.parallel([
+  async.apply(async.waterfall, [
+    async.apply(MongoClient.connect, process.env.MONGODB),
+    async.asyncify((client: MongoClient) => client.db('boobtree').collection('boobtree')),
+  ]),
+  async.apply(serveJs, app, '/js/boobtree.js', 'main_ui.ts'),
+  async.apply(serveJs, app, '/js/join.js', 'join.ts'),
+  async.apply(serveJs, app, '/js/new.js', 'newgame.ts'),
+  async.apply(serveCss, app, '/style/style.css', 'style.less'),
+], (err, results) => {
   if (err) {
     throw err;
   }
 
-  let db: Collection = client.db('boobtree').collection('boobtree');
+  let db: Collection = results[0];
 
   app.get(userRoute, (request, response) => {
     if (request.params.game in games) {
