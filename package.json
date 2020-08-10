@@ -4,7 +4,8 @@
 	"description": "Just... boobtree",
 	"scripts": {
 		"tsc": "tsc",
-		"lessc": "lessc"
+		"lessc": "lessc style.less style.css",
+		"browserify": "browserify -p tsify"
 	},
 	"dependencies": {
 		"@types/async": "",
@@ -24,8 +25,8 @@
 		"array-flatten": "",
 		"async": "",
 		"body-parser": "",
-		"browserify": "",
-    "crypto-random-string": "",
+		"browserify": "^16.5.2",
+		"crypto-random-string": "",
 		"express": "^4.12.4",
 		"fabric": "",
 		"jquery": "",
@@ -36,7 +37,7 @@
 		"socket.io": "",
 		"ts-node": "",
 		"tsify": "",
-		"typescript": "rc",
+		"typescript": "",
 		"typescript-simple": ""
 	},
 	"engines": {
