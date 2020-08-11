@@ -27,38 +27,34 @@ body {
   font-size: 2em;
 }
 
-.reveal {
-  background-color: #ffebc2;
+.archive {
+  .chain-header {
+    h1 {
+      width: 500px;
+      text-align: center;
+    }
+  }
 
-  .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  > div {
+    position: fixed;
 
     h1 {
       font-size: 3em;
     }
-
-    .text {
-      font-size: 2em;
-      height: 300px;
-      width: 500px;
-      text-align: center;
-    }
-
-    .text, img {
-      background-color: white;
-      border: 1px solid black;
-      margin-top: 20px;
-    }
   }
 
-  .final .content {
-    flex-direction: row;
+  .start-and-end {
+    display: flex;
+  }
 
-    > div {
-      margin: 10px;
-    }
+  .card-content {
+    font-size: 2em;
+    height: 300px;
+    width: 500px;
+    text-align: center;
+    background-color: white;
+    border: 1px solid black;
+    margin-top: 20px;
   }
 }
 

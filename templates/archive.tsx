@@ -6,62 +6,36 @@ import { ArchiveElt } from '../game';
 
 function showIndividualCard(card: ArchiveElt, index: number) {
   if (index % 2) {
-    return <section class="drawing">
-             <div class="content">
-               <h1>{ card.player_name } drew:</h1>
-               <img src={ card.phrase_or_drawing } />
-             </div>
-           </section>;
+    return <div class="card">
+             <div class="player-name">{ card.player_name } drew:</div>
+             <img class="card-content" src={ card.phrase_or_drawing } />
+           </div>;
   } else {
-    return <section class="text">
-             <div class="content">
-               <h1>{ card.player_name } wrote:</h1>
-               <div class="text">{ card.phrase_or_drawing }</div>
-             </div>
-           </section>;
+    return <div class="card">
+             <div class="player-name">{ card.player_name } wrote:</div>
+             <div class="card-content">{ card.phrase_or_drawing }</div>
+           </div>;
   }
 }
 
 function showChain(chain : ArchiveElt[], index: number) {
-  return <section>
-    <section class="chain-header">
-      <div class="content">
-        <h1>Chain { index + 1 }</h1>
+  return [
+    <div class="chain-header">
+      <h1>Chain { index + 1 }</h1>
+    </div>, chain.map(showIndividualCard), 
+    <div class="start-and-end">
+      <div>
+        Started with
+        <div class="card-content">{ chain[0].phrase_or_drawing }</div>
       </div>
-    </section>
-    { flatten(chain.map(showIndividualCard)) }
-    <section class="final">
-      <div class="content">
-        <div>
-          Started with
-          <div class="text">{ chain[0].phrase_or_drawing }</div>
-        </div>
-        <div>
-          Ended with
-          <div class="text">{ chain[chain.length-1].phrase_or_drawing }</div>
-        </div>
+      <div>
+        Ended with
+        <div class="card-content">{ chain[chain.length-1].phrase_or_drawing }</div>
       </div>
-    </section>
-  </section>
+    </div>]
 }
 
-export = (archive: ArchiveElt[][]) =>
-  <html>
-    <head>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/css/reveal.min.css" />
-      <link rel='stylesheet' href='/style/style.css' />
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.6.0/js/reveal.min.js" />
-      <title>Boobtree game archive</title>
-    </head>
-
-    <body>
-      <div class="reveal">
-        <div class="slides">
-          { flatten(archive.map(showChain)) }
-        </div>
-      </div>
-      <script>
-        Reveal.initialize({"{hash: true}"});
-      </script>
-    </body>
-  </html>;
+export = (archive: ArchiveElt[][]) => base('archive.js', 'Boobtree game archive',
+    <div class="archive">
+      { flatten(archive.map(showChain)) }
+    </div>);

@@ -38,6 +38,7 @@ let shortIds : { [shortId:string] : string } = {};
 serveStatic(app, '/js/boobtree.js', 'boobtree.js');
 serveStatic(app, '/js/join.js', 'join.js');
 serveStatic(app, '/js/new.js', 'new.js');
+serveStatic(app, '/js/archive.js', 'archive.js');
 serveStatic(app, '/style/style.css', 'style.css');
 serveStatic(app, '/', 'index.html');
 serveStatic(app, '/boobtrees.jpg', 'boobtrees.jpg');
