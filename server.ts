@@ -76,7 +76,7 @@ MongoClient.connect(process.env.MONGODB, (err, client) => {
       }
 
       let game = result.ops[0]._id.toHexString();
-      let shortId = cryptoRandomString({length: 6, type: 'distinguishable'});
+      let shortId = cryptoRandomString({length: 4, characters: 'CDEHKMPRTUWXY'});
       games[game] = new Game(db, game, shortId);
       shortIds[shortId] = game;
       
