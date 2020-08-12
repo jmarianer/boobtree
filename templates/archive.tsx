@@ -25,11 +25,11 @@ function showChain(chain : ArchiveElt[], index: number) {
     </div>, chain.map(showIndividualCard), 
     <div class="start-and-end">
       <div>
-        Started with
+        <div class="player-name">Started with { chain[0].player_name }</div>
         <div class="card-content">{ chain[0].phrase_or_drawing }</div>
       </div>
       <div>
-        Ended with
+        <div class="player-name">Ended with { chain[chain.length-1].player_name }</div>
         <div class="card-content">{ chain[chain.length-1].phrase_or_drawing }</div>
       </div>
     </div>]
