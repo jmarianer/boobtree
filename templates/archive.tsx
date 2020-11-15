@@ -30,7 +30,11 @@ function showChain(chain : ArchiveElt[], index: number) {
       </div>
       <div>
         <div class="player-name">Ended with { chain[chain.length-1].player_name }</div>
-        <div class="card-content">{ chain[chain.length-1].phrase_or_drawing }</div>
+        {
+          (chain.length-1 % 2)
+          ?  <img class="card-content" src={ chain[chain.length-1].phrase_or_drawing } />
+          : <div class="card-content">{ chain[chain.length-1].phrase_or_drawing }</div>
+        }
       </div>
     </div>]
 }
