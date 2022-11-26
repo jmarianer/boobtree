@@ -46,6 +46,6 @@
 	"license": "",
 	"devDependencies": {
 		"lesshint": "^6.3.7",
-		"tslint": "^4.3.1"
+		"tslint": "^6.1.3"
 	}
 }
