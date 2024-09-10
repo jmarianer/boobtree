@@ -27,7 +27,7 @@
 		"body-parser": "",
 		"browserify": "^16.5.2",
 		"crypto-random-string": "",
-		"express": "^4.20.0",
+		"express": "^5.0.0",
 		"fabric": "",
 		"jquery": "",
 		"jquery-ui": "",
